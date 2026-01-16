@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Local settings
+.claude/
+
+# Build output
+dist/
+
+# Millhouse state/session data
+.millhouse/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# npm
+*.tgz

@@ -1,0 +1,63 @@
+{
+  "name": "millhouse",
+  "version": "1.0.0",
+  "description": "Millhouse - Local CLI + web UI for running autonomous Codex AI agent loops",
+  "bin": {
+    "millhouse": "dist/src/cli.js"
+  },
+  "main": "dist/src/cli.js",
+  "files": [
+    "dist/**",
+    "prompts/**",
+    "README.md",
+    "AGENTS.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsc && node scripts/copy-assets.mjs",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/src/cli.js",
+    "ui": "npm run build --silent && node dist/src/cli.js ui",
+    "codex": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cli",
+    "codex",
+    "ai",
+    "automation",
+    "agent",
+    "openai",
+    "web-ui",
+    "loop-runner"
+  ],
+  "author": "Millhouse",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ordinalos/millhouse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ordinalos/millhouse/issues"
+  },
+  "homepage": "https://github.com/ordinalos/millhouse",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@openai/codex-sdk": "^0.80.0",
+    "env-paths": "^3.0.0",
+    "express": "^5.2.1",
+    "figlet": "^1.8.0",
+    "open": "^10.2.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/figlet": "^1.7.0",
+    "@types/node": "^25.0.6",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
