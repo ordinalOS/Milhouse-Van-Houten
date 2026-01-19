@@ -644,7 +644,11 @@
     };
 
     newProjectBtn.onclick = () => {
-      fetch("/api/browse", { method: "POST", headers: { "Content-Type": "application/json" } })
+      fetch("/api/browse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}"
+      })
         .then((r) => r.text().then((t) => ({ ok: r.ok, text: t })))
         .then(({ ok, text }) => {
           if (!text.trim()) return;
