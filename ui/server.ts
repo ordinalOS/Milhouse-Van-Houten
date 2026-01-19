@@ -87,6 +87,7 @@ function createServerContext(options: StartServerOptions): ServerContext {
 
   const app = express();
   app.use(express.json({ limit: "1mb" }));
+  app.get("/favicon.ico", (_req, res) => res.status(204).end());
   app.use(express.static(path.join(__dirname, "public")));
 
   const clients: Client[] = [];
