@@ -201,7 +201,7 @@ function createServerContext(options: StartServerOptions): ServerContext {
     }
   }
 
-  async function browseFolder(defaultPath?: string): Promise<string> {
+  async function browseFolder(defaultPath?: string): Promise<string | null> {
     return await new Promise((resolve, reject) => {
       const isWindows = process.platform === "win32";
       const isMac = process.platform === "darwin";
@@ -256,16 +256,19 @@ $topForm.Close()
 
         const ps = spawn("powershell", ["-NoProfile", "-STA", "-EncodedCommand", encoded]);
         let out = "";
+        let errOut = "";
         ps.stdout.on("data", (d) => (out += d.toString()));
-        ps.stderr.on("data", (d) => broadcast(`[browse stderr] ${d.toString().trim()}`));
+        ps.stderr.on("data", (d) => {
+          const line = d.toString().trim();
+          if (line) broadcast(`[browse stderr] ${line}`);
+          errOut += `${line}\n`;
+        });
         ps.on("error", (err) => reject(err));
         ps.on("exit", (code) => {
           const trimmed = out.trim();
-          if (code === 0 && trimmed) {
-            resolve(trimmed);
-          } else {
-            reject(new Error("Folder selection cancelled or failed"));
-          }
+          if (code === 0) return resolve(trimmed || null);
+          const errTrimmed = errOut.trim();
+          reject(new Error(errTrimmed || "Folder selection cancelled or failed"));
         });
         return;
       }
@@ -276,16 +279,20 @@ $topForm.Close()
           'set p to POSIX path of (choose folder with prompt "Select project folder")',
         ]);
         let out = "";
+        let errOut = "";
         osa.stdout.on("data", (d) => (out += d.toString()));
-        osa.stderr.on("data", (d) => broadcast(`[browse stderr] ${d.toString().trim()}`));
+        osa.stderr.on("data", (d) => {
+          const line = d.toString().trim();
+          if (line) broadcast(`[browse stderr] ${line}`);
+          errOut += `${line}\n`;
+        });
         osa.on("error", (err) => reject(err));
         osa.on("exit", (code) => {
           const trimmed = out.trim();
-          if (code === 0 && trimmed) {
-            resolve(trimmed);
-          } else {
-            reject(new Error("Folder selection cancelled or failed"));
-          }
+          if (code === 0) return resolve(trimmed || null);
+          const errTrimmed = errOut.trim();
+          if (!trimmed && errTrimmed.toLowerCase().includes("canceled")) return resolve(null);
+          reject(new Error(errTrimmed || "Folder selection cancelled or failed"));
         });
         return;
       }
@@ -294,16 +301,25 @@ $topForm.Close()
         const run = (command: string, args: string[], onMissing: () => void) => {
           const proc = spawn(command, args);
           let out = "";
+          let errOut = "";
           proc.stdout.on("data", (d) => (out += d.toString()));
-          proc.stderr.on("data", (d) => broadcast(`[browse stderr] ${d.toString().trim()}`));
+          proc.stderr.on("data", (d) => {
+            const line = d.toString().trim();
+            if (line) broadcast(`[browse stderr] ${line}`);
+            errOut += `${line}\n`;
+          });
           proc.on("error", (err: NodeJS.ErrnoException) => {
             if (err.code === "ENOENT") onMissing();
             else reject(err);
           });
           proc.on("exit", (code) => {
             const trimmed = out.trim();
-            if (code === 0 && trimmed) resolve(trimmed);
-            else reject(new Error("Folder selection cancelled or failed"));
+            if (code === 0) return resolve(trimmed || null);
+            const errTrimmed = errOut.trim();
+            if (!trimmed && (code === 1 || code == null) && (!errTrimmed || errTrimmed.toLowerCase().includes("canceled"))) {
+              return resolve(null);
+            }
+            reject(new Error(errTrimmed || "Folder selection cancelled or failed"));
           });
         };
 
@@ -332,6 +348,7 @@ $topForm.Close()
   async function handleBrowse(req: express.Request, res: express.Response) {
     try {
       const path = await browseFolder((req.body as any)?.defaultPath);
+      if (!path) return res.status(204).end();
       res.json({ path });
     } catch (err) {
       res.status(400).json({ error: (err as Error).message });

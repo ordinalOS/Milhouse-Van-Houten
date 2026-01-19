@@ -2,6 +2,8 @@
 
 ![Milhouse](milhouse.png)
 
+[milhouse on npm](https://www.npmjs.com/package/milhouse)
+
 Milhouse Van Houten is a chad pair programmer that provides a lightweight web UI for running Codex threads, starting with a quick planning phase and iterating through builds until the job is done. Inspired by a Ralph Wiggum-style autonomous loop, Milhouse focuses on simplicity, approachability, and making experimentation fun and easy to modify.
 
 This repository contains the **bare-bones** version of Milhouse. It represents the core foundation, with many new features, experiments, and feedback loops currently in the pipeline.
@@ -23,6 +25,24 @@ This repository contains the **bare-bones** version of Milhouse. It represents t
 
 ```bash
 npm install -g milhouse
+```
+
+## Quick Start
+
+1. Authenticate Codex (either works):
+   - Set `CODEX_API_KEY`, or
+   - Use local Codex auth if your Codex CLI is already authenticated.
+
+   Example (PowerShell):
+
+   ```powershell
+   $env:CODEX_API_KEY="..."
+   ```
+
+2. Launch the UI:
+
+```bash
+milhouse ui
 ```
 
 ## Usage
@@ -48,6 +68,8 @@ Options:
   --no-open             Don't auto-open browser
   --help, -h            Show help
 ```
+
+Note: the UI's folder picker is best-effort. If it fails, you can always paste a path into the Workdir field.
 
 ### Examples
 

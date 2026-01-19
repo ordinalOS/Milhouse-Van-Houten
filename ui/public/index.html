@@ -631,6 +631,7 @@
       })
         .then((r) => r.text().then((t) => ({ ok: r.ok, text: t })))
         .then(({ ok, text }) => {
+          if (!text.trim()) return;
           try {
             const data = JSON.parse(text);
             if (data.path) workdirEl.value = data.path;
@@ -646,6 +647,7 @@
       fetch("/api/browse", { method: "POST", headers: { "Content-Type": "application/json" } })
         .then((r) => r.text().then((t) => ({ ok: r.ok, text: t })))
         .then(({ ok, text }) => {
+          if (!text.trim()) return;
           let base = "";
           try {
             const data = JSON.parse(text);
