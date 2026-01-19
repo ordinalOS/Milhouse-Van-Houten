@@ -25,12 +25,6 @@ This repository contains the **bare-bones** version of Milhouse. It represents t
 npm install -g milhouse
 ```
 
-Installed `millhouse` by accident? `millhouse` is also published as an alias that installs `milhouse`:
-
-```bash
-npm install -g millhouse
-```
-
 ## Usage
 
 Start the Web UI:
@@ -38,8 +32,6 @@ Start the Web UI:
 ```bash
 milhouse ui
 ```
-
-(If you installed the alias package, use `milhouse ui`.)
 
 This opens a local web panel at `http://127.0.0.1:4173` (falls back to a free port if busy).
 
