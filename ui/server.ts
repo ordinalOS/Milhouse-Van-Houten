@@ -86,7 +86,7 @@ function createServerContext(options: StartServerOptions): ServerContext {
   const loopRunner = resolveLoopRunner(runtimeRoot);
 
   const app = express();
-  app.use(express.json({ limit: "1mb" }));
+  const jsonParser = express.json({ limit: "1mb" });
   app.get("/favicon.ico", (_req, res) => res.status(204).end());
   app.use(express.static(path.join(__dirname, "public")));
 
@@ -151,6 +151,10 @@ function createServerContext(options: StartServerOptions): ServerContext {
 
     saveSessions((sessions) => [...sessions, currentSession!]);
 
+    broadcast(`[milhouse] Starting run…`);
+    broadcast(`[milhouse] workdir: ${workdir}`);
+    broadcast(`[milhouse] state dir: ${stateDir}`);
+
     const args = [
       ...loopRunner.args,
       "--goal",
@@ -202,6 +206,26 @@ function createServerContext(options: StartServerOptions): ServerContext {
     }
   }
 
+  function parseBrowseDefaultPath(req: express.Request): string | undefined {
+    const body: unknown = (req as any).body;
+    if (!body) return undefined;
+    if (typeof body === "string") {
+      const trimmed = body.trim();
+      if (!trimmed) return undefined;
+      try {
+        const parsed = JSON.parse(trimmed) as { defaultPath?: unknown };
+        return typeof parsed.defaultPath === "string" ? parsed.defaultPath : undefined;
+      } catch {
+        return undefined;
+      }
+    }
+    if (typeof body === "object") {
+      const maybe = body as { defaultPath?: unknown };
+      return typeof maybe.defaultPath === "string" ? maybe.defaultPath : undefined;
+    }
+    return undefined;
+  }
+
   async function browseFolder(defaultPath?: string): Promise<string | null> {
     return await new Promise((resolve, reject) => {
       const isWindows = process.platform === "win32";
@@ -212,9 +236,18 @@ function createServerContext(options: StartServerOptions): ServerContext {
         const initialDirectory = defaultPath?.trim() ? defaultPath.replace(/'/g, "''") : "";
 
         const script = `
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-Add-Type -TypeDefinition @"
+$ErrorActionPreference = 'Stop'
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::InputEncoding = [System.Text.Encoding]::UTF8
+
+function Write-Err([string]$msg) {
+  try { [Console]::Error.WriteLine($msg) } catch {}
+}
+
+function Try-FolderBrowserDialog([string]$initial) {
+  Add-Type -AssemblyName System.Windows.Forms
+  Add-Type -AssemblyName System.Drawing
+  Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
 public static class User32 {
@@ -223,39 +256,63 @@ public static class User32 {
 }
 "@
 
-$topForm = New-Object System.Windows.Forms.Form
-$topForm.TopMost = $true
-$topForm.ShowInTaskbar = $false
-$topForm.FormBorderStyle = 'FixedToolWindow'
-$topForm.StartPosition = 'Manual'
-$topForm.Location = New-Object System.Drawing.Point(-32000, -32000)
-$topForm.Size = New-Object System.Drawing.Size(1, 1)
-$topForm.Opacity = 0
-$topForm.Show()
-$topForm.Activate()
-$topForm.BringToFront()
-$topForm.Focus()
-[User32]::SetForegroundWindow($topForm.Handle) | Out-Null
-[System.Windows.Forms.Application]::DoEvents()
+  $topForm = New-Object System.Windows.Forms.Form
+  $topForm.TopMost = $true
+  $topForm.ShowInTaskbar = $false
+  $topForm.FormBorderStyle = 'FixedToolWindow'
+  $topForm.StartPosition = 'Manual'
+  $topForm.Location = New-Object System.Drawing.Point(-32000, -32000)
+  $topForm.Size = New-Object System.Drawing.Size(1, 1)
+  $topForm.Opacity = 0
+  $topForm.Show()
+  $topForm.Activate()
+  $topForm.BringToFront()
+  $topForm.Focus()
+  [User32]::SetForegroundWindow($topForm.Handle) | Out-Null
+  [System.Windows.Forms.Application]::DoEvents()
 
-$dlg = New-Object System.Windows.Forms.OpenFileDialog
-$dlg.Title = 'Select project folder'
-$dlg.ValidateNames = $false
-$dlg.CheckFileExists = $false
-$dlg.CheckPathExists = $true
-$dlg.FileName = 'Select Folder'
-${initialDirectory ? `$dlg.InitialDirectory = '${initialDirectory}'` : ""}
+  $dlg = New-Object System.Windows.Forms.FolderBrowserDialog
+  $dlg.Description = 'Select project folder'
+  if ($initial) { $dlg.SelectedPath = $initial }
 
-$result = $dlg.ShowDialog($topForm)
-if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-  Write-Output (Split-Path -Parent $dlg.FileName)
+  $result = $dlg.ShowDialog($topForm)
+  $topForm.Close()
+
+  if ($result -eq [System.Windows.Forms.DialogResult]::OK -and $dlg.SelectedPath) {
+    return $dlg.SelectedPath
+  }
+  return $null
 }
-$topForm.Close()
+
+function Try-ShellBrowseForFolder([string]$initial) {
+  $shell = New-Object -ComObject Shell.Application
+  $root = 0
+  if ($initial) { $root = $initial }
+  $folder = $shell.BrowseForFolder(0, 'Select project folder', 0, $root)
+  if ($folder -and $folder.Self -and $folder.Self.Path) {
+    return $folder.Self.Path
+  }
+  return $null
+}
+
+try {
+  $initial = ${initialDirectory ? `'${initialDirectory}'` : "''"}
+  $path = $null
+  try { $path = Try-FolderBrowserDialog $initial } catch {}
+  if (-not $path) {
+    try { $path = Try-ShellBrowseForFolder $initial } catch {}
+  }
+  if ($path) { Write-Output $path }
+  exit 0
+} catch {
+  Write-Err ($_.Exception.Message)
+  exit 1
+}
 `;
 
         const encoded = Buffer.from(script, "utf16le").toString("base64");
 
-        const ps = spawn("powershell", ["-NoProfile", "-STA", "-EncodedCommand", encoded]);
+        const ps = spawn("powershell.exe", ["-NoProfile", "-STA", "-EncodedCommand", encoded]);
         let out = "";
         let errOut = "";
         ps.stdout.on("data", (d) => (out += d.toString()));
@@ -269,6 +326,9 @@ $topForm.Close()
           const trimmed = out.trim();
           if (code === 0) return resolve(trimmed || null);
           const errTrimmed = errOut.trim();
+          if (!trimmed && !errTrimmed) return resolve(null);
+          if (!trimmed && errTrimmed.toLowerCase().includes("cancel")) return resolve(null);
+          if (trimmed && fs.existsSync(trimmed)) return resolve(trimmed);
           reject(new Error(errTrimmed || "Folder selection cancelled or failed"));
         });
         return;
@@ -348,11 +408,13 @@ $topForm.Close()
 
   async function handleBrowse(req: express.Request, res: express.Response) {
     try {
-      const path = await browseFolder((req.body as any)?.defaultPath);
+      const path = await browseFolder(parseBrowseDefaultPath(req));
       if (!path) return res.status(204).end();
       res.json({ path });
     } catch (err) {
-      res.status(400).json({ error: (err as Error).message });
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.toLowerCase().includes("cancel")) return res.status(204).end();
+      res.status(400).json({ error: message });
     }
   }
 
@@ -391,7 +453,9 @@ $topForm.Close()
     res.json({ sessions });
   });
 
-  app.post("/api/start", (req, res) => {
+  app.post("/api/browse", express.text({ type: "*/*", limit: "64kb" }), handleBrowse);
+
+  app.post("/api/start", jsonParser, (req, res) => {
     const { goal, maxIterations = 0, workdir = defaultWorkdir, createIfMissing = true } = req.body || {};
     if (!goal || typeof goal !== "string") {
       return res.status(400).json({ error: "goal is required" });
@@ -424,9 +488,6 @@ $topForm.Close()
     if (!currentSession) return res.json({});
     res.json(readArtifacts(currentSession.stateDir));
   });
-
-  app.post("/api/browse", handleBrowse);
-  app.get("/api/browse", handleBrowse);
 
   return { app, stop: stopSession };
 }

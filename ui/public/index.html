@@ -466,6 +466,7 @@
 
     let es;
     let running = false;
+    let streamConnected = false;
 
     function appendLog(line) {
       logsEl.textContent += line + "\n";
@@ -550,7 +551,11 @@
         );
       });
 
-      artifactsEl.innerHTML = parts.join("") || "<em>No artifacts yet.</em>";
+      if (parts.length === 0) {
+        artifactsEl.innerHTML = running ? "<em>Waiting for artifacts...</em>" : "<em>No artifacts yet.</em>";
+        return;
+      }
+      artifactsEl.innerHTML = parts.join("");
     }
 
     function escapeHtml(str) {
@@ -569,7 +574,20 @@
 
     function startStream() {
       if (es) es.close();
+      streamConnected = false;
+      appendLog("[ui] Connecting to live logs...");
       es = new EventSource("/api/events");
+      es.onopen = () => {
+        if (streamConnected) return;
+        streamConnected = true;
+        appendLog("[ui] Live logs connected.");
+      };
+      es.onerror = () => {
+        if (streamConnected) {
+          streamConnected = false;
+          appendLog("[ui] Live logs disconnected (will retry)...");
+        }
+      };
       es.onmessage = (ev) => {
         appendLog(ev.data);
         const threadMatch = ev.data.match(/thread:\s*([0-9a-zA-Z-]+)/);
@@ -594,6 +612,8 @@
         workdir: workdirEl.value.trim() || undefined,
       };
       setRunning(true);
+      setStatus("Starting...", "running");
+      appendLog("[ui] Starting run...");
       const res = await fetch("/api/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -607,6 +627,7 @@
         return;
       }
       setStatus("Running", "running");
+      appendLog("[ui] Run started. Waiting for first logs/artifacts...");
       fetchStatus();
       fetchSessions();
     };
@@ -635,7 +656,10 @@
           try {
             const data = JSON.parse(text);
             if (data.path) workdirEl.value = data.path;
-            else if (data.error) appendLog("Browse error: " + data.error);
+            else if (data.error) {
+              if (String(data.error).toLowerCase().includes("cancel")) return;
+              appendLog("Browse error: " + data.error);
+            }
           } catch {
             if (!ok) appendLog("Browse error: " + text.slice(0, 200));
           }
@@ -656,6 +680,7 @@
           try {
             const data = JSON.parse(text);
             if (!data.path && data.error) {
+              if (String(data.error).toLowerCase().includes("cancel")) return;
               appendLog("Browse error: " + data.error);
               return;
             }
