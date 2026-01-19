@@ -404,6 +404,17 @@ $topForm.Close()
     }
   });
 
+  app.use((err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (req.method === "POST" && req.path === "/api/browse") {
+      const status = typeof (err as any)?.status === "number" ? (err as any).status : undefined;
+      const type = typeof (err as any)?.type === "string" ? (err as any).type : undefined;
+      if (status === 400 && type === "entity.parse.failed") {
+        return res.status(204).end();
+      }
+    }
+    next(err);
+  });
+
   app.post("/api/stop", (_req, res) => {
     stopSession();
     res.json({ ok: true });
