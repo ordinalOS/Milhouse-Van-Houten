@@ -1,6 +1,6 @@
 {
   "name": "milhouse",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Milhouse Van Houten - Local CLI + web UI for running autonomous Codex AI agent loops",
   "bin": {
     "milhouse": "dist/src/cli.js"
