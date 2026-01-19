@@ -1,15 +1,15 @@
-# Millhouse
+# Milhouse Van Houten
 
-![Millhouse](millhouse.png)
+![Milhouse](milhouse.png)
 
-Millhouse is a chad pair programmer that provides a lightweight web UI for running Codex threads, starting with a quick planning phase and iterating through builds until the job is done. Inspired by a Ralph Wiggum–style autonomous loop, Millhouse focuses on simplicity, approachability, and making experimentation fun and easy to modify.
+Milhouse Van Houten is a chad pair programmer that provides a lightweight web UI for running Codex threads, starting with a quick planning phase and iterating through builds until the job is done. Inspired by a Ralph Wiggum-style autonomous loop, Milhouse focuses on simplicity, approachability, and making experimentation fun and easy to modify.
 
-This repository contains the **bare-bones** version of Millhouse. It represents the core foundation, with many new features, experiments, and feedback loops currently in the pipeline.
+This repository contains the **bare-bones** version of Milhouse. It represents the core foundation, with many new features, experiments, and feedback loops currently in the pipeline.
 
 ## Features
 
 * Web UI for managing Codex runs
-* Ralph Wiggum–style autonomous loop system: plan once, then iterate builds until done
+* Ralph Wiggum-style autonomous loop system: plan once, then iterate builds until done
 * Live logs via Server-Sent Events (SSE)
 * Session history with status tracking
 * Cross-platform folder picker (Windows, macOS, Linux)
@@ -22,6 +22,12 @@ This repository contains the **bare-bones** version of Millhouse. It represents 
 ## Install
 
 ```bash
+npm install -g milhouse
+```
+
+Installed `millhouse` by accident? `millhouse` is also published as an alias that installs `milhouse`:
+
+```bash
 npm install -g millhouse
 ```
 
@@ -30,15 +36,17 @@ npm install -g millhouse
 Start the Web UI:
 
 ```bash
-millhouse ui
+milhouse ui
 ```
+
+(If you installed the alias package, use `milhouse ui`.)
 
 This opens a local web panel at `http://127.0.0.1:4173` (falls back to a free port if busy).
 
 ### CLI Options
 
 ```text
-millhouse ui [OPTIONS]
+milhouse ui [OPTIONS]
 
 Options:
   --host <ip>           Server host (default: 127.0.0.1)
@@ -53,22 +61,22 @@ Options:
 
 ```bash
 # Start with default settings
-millhouse ui
+milhouse ui
 
 # Specify a project directory
-millhouse ui --workdir /path/to/project
+milhouse ui --workdir /path/to/project
 
 # Use a custom port
-millhouse ui --port 8080
+milhouse ui --port 8080
 
 # Don't auto-open browser
-millhouse ui --no-open
+milhouse ui --no-open
 ```
 
 ## How It Works
 
-1. **Plan Phase**: Enter a goal in the Web UI. Millhouse generates an `IMPLEMENTATION_PLAN.md` with prioritized tasks.
-2. **Build Loop**: Millhouse iteratively executes tasks from the plan, updating progress after each iteration.
+1. **Plan Phase**: Enter a goal in the Web UI. Milhouse generates an `IMPLEMENTATION_PLAN.md` with prioritized tasks.
+2. **Build Loop**: Milhouse iteratively executes tasks from the plan, updating progress after each iteration.
 3. **Completion**: When all tasks are done, the plan is marked `STATUS: DONE` and the loop exits.
 
 ## Web UI Features
@@ -83,8 +91,8 @@ millhouse ui --no-open
 
 ```bash
 # Clone the repository
-git clone https://github.com/ordinalOS/millhouse.git
-cd millhouse
+git clone https://github.com/ordinalOS/Milhouse-Van-Houten.git
+cd Milhouse-Van-Houten
 
 # Install dependencies
 npm install
@@ -102,12 +110,14 @@ npm run ui
 ## Environment Variables
 
 * `CODEX_API_KEY`: OpenAI Codex API key (optional if using local Codex auth)
-* `MILLHOUSE_STATE_DIR`: Override default state directory
-* `MILLHOUSE_DEFAULT_WORKDIR`: Override default working directory
+* `MILHOUSE_STATE_DIR`: Override default state directory
+* `MILHOUSE_DEFAULT_WORKDIR`: Override default working directory
+
+(Legacy env vars `MILLHOUSE_STATE_DIR` / `MILLHOUSE_DEFAULT_WORKDIR` are still supported.)
 
 ## How to Contribute
 
-Thank you for considering contributing to Millhouse! This repository is intentionally open-ended, and we welcome contributions of all kinds — including bug fixes, enhancements, documentation improvements, new loops, unconventional experiments, and wild ideas.
+Thank you for considering contributing to Milhouse! This repository is intentionally open-ended, and we welcome contributions of all kinds — including bug fixes, enhancements, documentation improvements, new loops, unconventional experiments, and wild ideas.
 
 If you have something you want to try, this is the place to do it. Fork the repository, explore freely, and open a pull request when you’re ready. No idea is a bad idea. Creativity encouraged.
 

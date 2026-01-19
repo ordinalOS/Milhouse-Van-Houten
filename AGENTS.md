@@ -2,7 +2,7 @@
 
 ## Project Structure
 
-- `src/cli.ts`: npm-installed CLI entrypoint (`millhouse`) with the yellow header.
+- `src/cli.ts`: npm-installed CLI entrypoint (`milhouse`) with the yellow header.
 - `ui/server.ts`: Express server for the local web UI; static assets live in `ui/public/` (copied to `dist/ui/public/` on build).
 - `src/loop-runner.ts`: Node-based loop engine used by the UI (plan once, then iterate until `STATUS: DONE`).
 - `prompts/*.md`: Prompt templates used by the loop runner (interpolate `{{GOAL}}` and `{{PLAN_PATH}}`).
@@ -22,8 +22,8 @@ npm run dev -- ui      # run UI from TS via tsx
 
 Installed usage (after publish):
 ```bash
-npm install -g millhouse
-millhouse ui
+npm install -g milhouse
+milhouse ui
 ```
 
 ## Coding Style & Naming Conventions
@@ -46,4 +46,4 @@ millhouse ui
 ## Security & Configuration Tips
 
 - Never commit secrets. `CODEX_API_KEY` is optional (can fall back to local Codex auth if configured).
-- State/logs default to the OS user data directory; override with `MILLHOUSE_STATE_DIR` or `millhouse ui --state-dir <path>`.
+- State/logs default to the OS user data directory; override with `MILHOUSE_STATE_DIR` or `milhouse ui --state-dir <path>`.

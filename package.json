@@ -1,9 +1,9 @@
 {
-  "name": "millhouse",
-  "version": "1.0.0",
-  "description": "Millhouse - Local CLI + web UI for running autonomous Codex AI agent loops",
+  "name": "milhouse",
+  "version": "1.0.1",
+  "description": "Milhouse Van Houten - Local CLI + web UI for running autonomous Codex AI agent loops",
   "bin": {
-    "millhouse": "dist/src/cli.js"
+    "milhouse": "dist/src/cli.js"
   },
   "main": "dist/src/cli.js",
   "files": [
@@ -32,16 +32,16 @@
     "web-ui",
     "loop-runner"
   ],
-  "author": "Millhouse",
+  "author": "Milhouse Van Houten",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ordinalos/millhouse.git"
+    "url": "git+https://github.com/ordinalOS/Milhouse-Van-Houten.git"
   },
   "bugs": {
-    "url": "https://github.com/ordinalos/millhouse/issues"
+    "url": "https://github.com/ordinalOS/Milhouse-Van-Houten/issues"
   },
-  "homepage": "https://github.com/ordinalos/millhouse",
+  "homepage": "https://github.com/ordinalOS/Milhouse-Van-Houten",
   "type": "module",
   "engines": {
     "node": ">=18"

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import path from "node:path";
 import open from "open";
-import { printMillhouseHeader } from "./banner.js";
+import { printMilhouseHeader } from "./banner.js";
 import { startServer } from "../ui/server.js";
 
 type UiOptions = {
@@ -15,11 +15,11 @@ type UiOptions = {
 function printHelp(): void {
   const help = [
     "Usage:",
-    "  millhouse ui [--workdir <path>] [--port <n>] [--host <ip>] [--state-dir <path>] [--no-open]",
+    "  milhouse ui [--workdir <path>] [--port <n>] [--host <ip>] [--state-dir <path>] [--no-open]",
     "",
     "Examples:",
-    "  millhouse ui --workdir .",
-    "  millhouse ui --port 4173",
+    "  milhouse ui --workdir .",
+    "  milhouse ui --port 4173",
   ];
   process.stdout.write(`${help.join("\n")}\n`);
 }
@@ -88,19 +88,19 @@ async function main(): Promise<void> {
   const cmd = argv[0];
 
   if (!cmd || cmd === "--help" || cmd === "-h") {
-    printMillhouseHeader();
+    printMilhouseHeader();
     printHelp();
     return;
   }
 
   if (cmd !== "ui") {
-    printMillhouseHeader();
+    printMilhouseHeader();
     throw new Error(`Unknown command: ${cmd}`);
   }
 
   const options = parseUiOptions(argv.slice(1));
 
-  printMillhouseHeader();
+  printMilhouseHeader();
   const { url } = await startServer({
     host: options.host,
     port: options.port,
@@ -108,7 +108,7 @@ async function main(): Promise<void> {
     stateBaseDir: options.stateDir,
   });
 
-  process.stdout.write(`Millhouse panel running at ${url}\n`);
+  process.stdout.write(`Milhouse panel running at ${url}\n`);
   if (options.openBrowser) {
     try {
       await open(url);

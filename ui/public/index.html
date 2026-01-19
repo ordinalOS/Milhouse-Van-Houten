@@ -1,667 +1,691 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Millhouse</title>
-    <style>
-      @font-face {
-        font-family: 'Chicago';
-        src: local('Chicago'), local('Charcoal');
-      }
 
-      :root {
-        --platinum: #DDDDDD;
-        --platinum-dark: #BBBBBB;
-        --platinum-light: #EEEEEE;
-        --window-bg: #DDDDDD;
-        --text: #000000;
-        --highlight: #3366CC;
-        --title-bar: linear-gradient(180deg, #FFFFFF 0%, #CCCCCC 10%, #DDDDDD 50%, #AAAAAA 100%);
-        --button-face: linear-gradient(180deg, #FFFFFF 0%, #DDDDDD 45%, #BBBBBB 55%, #CCCCCC 100%);
-        --inset: inset 1px 1px 0 #888888, inset -1px -1px 0 #FFFFFF;
-        --outset: inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 #888888;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Milhouse</title>
+  <style>
+    @font-face {
+      font-family: 'Chicago';
+      src: local('Chicago'), local('Charcoal');
+    }
 
-      * {
-        box-sizing: border-box;
-      }
+    :root {
+      --platinum: #DDDDDD;
+      --platinum-dark: #BBBBBB;
+      --platinum-light: #EEEEEE;
+      --window-bg: #DDDDDD;
+      --text: #000000;
+      --highlight: #3366CC;
+      --title-bar: linear-gradient(180deg, #FFFFFF 0%, #CCCCCC 10%, #DDDDDD 50%, #AAAAAA 100%);
+      --button-face: linear-gradient(180deg, #FFFFFF 0%, #DDDDDD 45%, #BBBBBB 55%, #CCCCCC 100%);
+      --inset: inset 1px 1px 0 #888888, inset -1px -1px 0 #FFFFFF;
+      --outset: inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 #888888;
+    }
 
-      body {
-        margin: 0;
-        min-height: 100vh;
-        background: #6699CC;
-        font-family: Geneva, 'Lucida Grande', Verdana, sans-serif;
-        font-size: 12px;
-        color: var(--text);
-        padding: 20px;
-      }
+    * {
+      box-sizing: border-box;
+    }
 
-      /* Background image */
-      .millhouse-background {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 300px;
-        height: 300px;
-        background-image: url('/millhouse.png');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        z-index: 0;
-        opacity: 0.5;
-        pointer-events: none;
-      }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #6699CC;
+      font-family: Geneva, 'Lucida Grande', Verdana, sans-serif;
+      font-size: 12px;
+      color: var(--text);
+      padding: 20px;
+    }
 
-      .desktop {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        max-width: 800px;
-        margin: 0 auto;
-      }
+    /* Running indicator */
+    .milhouse-running {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      z-index: 0;
+      pointer-events: none;
+    }
 
-      /* Mac OS 9 Window */
-      .window {
-        background: var(--window-bg);
-        border: 1px solid #000000;
-        box-shadow: 1px 1px 0 #000000, 2px 2px 8px rgba(0,0,0,0.3);
-      }
+    .milhouse-running.visible {
+      display: flex;
+    }
 
-      .title-bar {
-        background: var(--title-bar);
-        border-bottom: 1px solid #000000;
-        padding: 3px 6px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        height: 22px;
-        cursor: default;
-        user-select: none;
-      }
+    .milhouse-running img {
+      width: 120px;
+      height: 120px;
+      opacity: 0.8;
+    }
 
-      .title-bar-stripes {
-        flex: 1;
-        height: 12px;
-        background: repeating-linear-gradient(
-          180deg,
+    .milhouse-running .caption {
+      font-size: 10px;
+      color: #FFFFFF;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .desktop {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Mac OS 9 Window */
+    .window {
+      background: var(--window-bg);
+      border: 1px solid #000000;
+      box-shadow: 1px 1px 0 #000000, 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .title-bar {
+      background: var(--title-bar);
+      border-bottom: 1px solid #000000;
+      padding: 3px 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 22px;
+      cursor: default;
+      user-select: none;
+    }
+
+    .title-bar-stripes {
+      flex: 1;
+      height: 12px;
+      background: repeating-linear-gradient(180deg,
           #FFFFFF 0px,
           #FFFFFF 1px,
           #AAAAAA 1px,
           #AAAAAA 2px,
           #CCCCCC 2px,
-          #CCCCCC 3px
-        );
-        border: 1px solid #888888;
-      }
+          #CCCCCC 3px);
+      border: 1px solid #888888;
+    }
 
-      .close-box {
-        width: 13px;
-        height: 13px;
-        background: var(--button-face);
-        border: 1px solid #000000;
-        box-shadow: var(--outset);
-        flex-shrink: 0;
-      }
+    .close-box {
+      width: 13px;
+      height: 13px;
+      background: var(--button-face);
+      border: 1px solid #000000;
+      box-shadow: var(--outset);
+      flex-shrink: 0;
+    }
 
-      .window-title {
-        font-weight: bold;
-        font-size: 12px;
-        padding: 0 8px;
-        white-space: nowrap;
-      }
+    .window-title {
+      font-weight: bold;
+      font-size: 12px;
+      padding: 0 8px;
+      white-space: nowrap;
+    }
 
-      .window-content {
-        padding: 12px;
-      }
+    .window-content {
+      padding: 12px;
+    }
 
-      /* Classic Mac Buttons */
-      .btn {
-        font-family: Geneva, 'Lucida Grande', Verdana, sans-serif;
-        font-size: 12px;
-        padding: 4px 16px;
-        background: var(--button-face);
-        border: 1px solid #000000;
-        box-shadow: var(--outset);
-        cursor: pointer;
-        min-height: 22px;
-      }
+    /* Classic Mac Buttons */
+    .btn {
+      font-family: Geneva, 'Lucida Grande', Verdana, sans-serif;
+      font-size: 12px;
+      padding: 4px 16px;
+      background: var(--button-face);
+      border: 1px solid #000000;
+      box-shadow: var(--outset);
+      cursor: pointer;
+      min-height: 22px;
+    }
 
-      .btn:active {
-        box-shadow: var(--inset);
-        background: var(--platinum-dark);
-      }
+    .btn:active {
+      box-shadow: var(--inset);
+      background: var(--platinum-dark);
+    }
 
-      .btn-default {
-        border: 2px solid #000000;
-        border-radius: 6px;
-        padding: 4px 20px;
-      }
+    .btn-default {
+      border: 2px solid #000000;
+      border-radius: 6px;
+      padding: 4px 20px;
+    }
 
-      /* Text Fields */
-      .text-field {
-        font-family: Geneva, 'Lucida Grande', Verdana, sans-serif;
-        font-size: 12px;
-        padding: 3px 4px;
-        background: #FFFFFF;
-        border: 1px solid #000000;
-        box-shadow: var(--inset);
-      }
+    /* Text Fields */
+    .text-field {
+      font-family: Geneva, 'Lucida Grande', Verdana, sans-serif;
+      font-size: 12px;
+      padding: 3px 4px;
+      background: #FFFFFF;
+      border: 1px solid #000000;
+      box-shadow: var(--inset);
+    }
 
-      .text-field:focus {
-        outline: none;
-      }
+    .text-field:focus {
+      outline: none;
+    }
 
-      textarea.text-field {
-        resize: vertical;
-        min-height: 60px;
-      }
+    textarea.text-field {
+      resize: vertical;
+      min-height: 60px;
+    }
 
-      /* Labels */
-      label {
-        display: block;
-        margin-bottom: 4px;
-        font-weight: bold;
-      }
+    /* Labels */
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
 
-      /* Form Groups */
-      .form-group {
-        margin-bottom: 12px;
-      }
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 12px;
+    }
 
-      /* Divider */
-      .divider {
-        border: none;
-        border-top: 1px solid #888888;
-        border-bottom: 1px solid #FFFFFF;
-        margin: 12px 0;
-      }
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid #888888;
+      border-bottom: 1px solid #FFFFFF;
+      margin: 12px 0;
+    }
 
-      /* Status Area */
-      .status-bar {
-        background: var(--platinum-light);
-        border: 1px solid #888888;
-        box-shadow: var(--inset);
-        padding: 4px 8px;
-        font-size: 11px;
-        display: flex;
-        gap: 12px;
-      }
+    /* Status Area */
+    .status-bar {
+      background: var(--platinum-light);
+      border: 1px solid #888888;
+      box-shadow: var(--inset);
+      padding: 4px 8px;
+      font-size: 11px;
+      display: flex;
+      gap: 12px;
+    }
 
-      .status-item {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-      .status-led {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #00AA00;
-        border: 1px solid #006600;
-      }
+    .status-led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #00AA00;
+      border: 1px solid #006600;
+    }
 
-      .status-led.idle {
-        background: #888888;
-        border-color: #555555;
-      }
+    .status-led.idle {
+      background: #888888;
+      border-color: #555555;
+    }
 
-      .status-led.running {
-        background: #00AA00;
-        border-color: #006600;
-      }
+    .status-led.running {
+      background: #00AA00;
+      border-color: #006600;
+    }
 
-      .status-led.error {
-        background: #CC0000;
-        border-color: #880000;
-      }
+    .status-led.error {
+      background: #CC0000;
+      border-color: #880000;
+    }
 
-      /* Log Area */
-      .log-area {
-        background: #FFFFFF;
-        border: 1px solid #000000;
-        box-shadow: var(--inset);
-        font-family: Monaco, 'Courier New', monospace;
-        font-size: 10px;
-        padding: 6px;
-        height: 200px;
-        overflow-y: scroll;
-        white-space: pre-wrap;
-        word-break: break-all;
-      }
+    /* Log Area */
+    .log-area {
+      background: #FFFFFF;
+      border: 1px solid #000000;
+      box-shadow: var(--inset);
+      font-family: Monaco, 'Courier New', monospace;
+      font-size: 10px;
+      padding: 6px;
+      height: 200px;
+      overflow-y: scroll;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
 
-      /* Button Row */
-      .button-row {
-        display: flex;
-        gap: 8px;
-        margin-top: 12px;
-        justify-content: flex-end;
-      }
+    /* Button Row */
+    .button-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      justify-content: flex-end;
+    }
 
-      .button-row-left {
-        justify-content: flex-start;
-      }
+    .button-row-left {
+      justify-content: flex-start;
+    }
 
-      /* Grid Layout */
+    /* Grid Layout */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Sessions List */
+    .list-box {
+      background: #FFFFFF;
+      border: 1px solid #000000;
+      box-shadow: var(--inset);
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .list-item {
+      padding: 2px 6px;
+      border-bottom: 1px solid #DDDDDD;
+      font-size: 11px;
+      cursor: default;
+    }
+
+    .list-item:last-child {
+      border-bottom: none;
+    }
+
+    .list-item:hover {
+      background: var(--highlight);
+      color: #FFFFFF;
+    }
+
+    .list-item .meta {
+      color: #666666;
+      font-size: 10px;
+    }
+
+    .list-item:hover .meta {
+      color: #CCCCCC;
+    }
+
+    /* Section Header */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .section-header h3 {
+      margin: 0;
+      font-size: 12px;
+    }
+
+    /* Checkbox */
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+    }
+
+    @media (max-width: 600px) {
       .grid-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
+        grid-template-columns: 1fr;
       }
 
-      /* Sessions List */
-      .list-box {
-        background: #FFFFFF;
-        border: 1px solid #000000;
-        box-shadow: var(--inset);
-        max-height: 150px;
-        overflow-y: auto;
+      .milhouse-running img {
+        width: 80px;
+        height: 80px;
       }
+    }
+  </style>
+</head>
 
-      .list-item {
-        padding: 2px 6px;
-        border-bottom: 1px solid #DDDDDD;
-        font-size: 11px;
-        cursor: default;
-      }
+<body>
+  <div id="milhouse-running" class="milhouse-running">
+    <img src="/milhouse.gif" alt="Milhouse">
+    <span class="caption">everything is coming up milhouse</span>
+  </div>
 
-      .list-item:last-child {
-        border-bottom: none;
-      }
-
-      .list-item:hover {
-        background: var(--highlight);
-        color: #FFFFFF;
-      }
-
-      .list-item .meta {
-        color: #666666;
-        font-size: 10px;
-      }
-
-      .list-item:hover .meta {
-        color: #CCCCCC;
-      }
-
-      /* Section Header */
-      .section-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-      }
-
-      .section-header h3 {
-        margin: 0;
-        font-size: 12px;
-      }
-
-      /* Checkbox */
-      .checkbox-row {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 11px;
-      }
-
-      @media (max-width: 600px) {
-        .grid-2 {
-          grid-template-columns: 1fr;
-        }
-        .millhouse-background {
-          width: 200px;
-          height: 200px;
-          opacity: 0.3;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="millhouse-background"></div>
-
-    <div class="desktop">
-      <!-- Main Window -->
-      <div class="window">
-        <div class="title-bar">
-          <div class="close-box"></div>
-          <div class="title-bar-stripes"></div>
-          <span class="window-title">Millhouse</span>
-          <div class="title-bar-stripes"></div>
-        </div>
-        <div class="window-content">
-          <div class="status-bar">
-            <div class="status-item">
-              <div id="status-led" class="status-led idle"></div>
-              <span id="status">Idle</span>
-            </div>
-            <div class="status-item">
-              <span id="thread"></span>
-            </div>
+  <div class="desktop">
+    <!-- Main Window -->
+    <div class="window">
+      <div class="title-bar">
+        <div class="close-box"></div>
+        <div class="title-bar-stripes"></div>
+        <span class="window-title">Milhouse</span>
+        <div class="title-bar-stripes"></div>
+      </div>
+      <div class="window-content">
+        <div class="status-bar">
+          <div class="status-item">
+            <div id="status-led" class="status-led idle"></div>
+            <span id="status">Idle</span>
           </div>
+          <div class="status-item">
+            <span id="thread"></span>
+          </div>
+        </div>
 
-          <hr class="divider">
+        <hr class="divider">
 
+        <div class="form-group">
+          <label for="goal">Goal:</label>
+          <textarea id="goal" class="text-field" style="width:100%;" placeholder="Enter your goal..."></textarea>
+        </div>
+
+        <div class="grid-2">
           <div class="form-group">
-            <label for="goal">Goal:</label>
-            <textarea id="goal" class="text-field" style="width:100%;" placeholder="Enter your goal..."></textarea>
-          </div>
-
-          <div class="grid-2">
-            <div class="form-group">
-              <label for="workdir">Project Path:</label>
-              <input id="workdir" type="text" class="text-field" style="width:100%;" placeholder="C:\path\to\project">
-              <div class="button-row button-row-left">
-                <button id="open-project" class="btn">Browse...</button>
-                <button id="new-project" class="btn">New...</button>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="max">Max Iterations:</label>
-              <input id="max" type="number" class="text-field" value="5" min="0" style="width:80px;">
-              <div style="font-size:10px;color:#666;margin-top:4px;">0 = unlimited</div>
+            <label for="workdir">Project Path:</label>
+            <input id="workdir" type="text" class="text-field" style="width:100%;" placeholder="C:\path\to\project">
+            <div class="button-row button-row-left">
+              <button id="open-project" class="btn">Browse...</button>
+              <button id="new-project" class="btn">New...</button>
             </div>
           </div>
-
-          <hr class="divider">
-
-          <div class="button-row">
-            <button id="stop" class="btn">Stop</button>
-            <button id="start" class="btn btn-default">Start</button>
+          <div class="form-group">
+            <label for="max">Max Iterations:</label>
+            <input id="max" type="number" class="text-field" value="5" min="0" style="width:80px;">
+            <div style="font-size:10px;color:#666;margin-top:4px;">0 = unlimited</div>
           </div>
         </div>
-      </div>
 
-      <!-- Logs Window -->
-      <div class="window">
-        <div class="title-bar">
-          <div class="close-box"></div>
-          <div class="title-bar-stripes"></div>
-          <span class="window-title">Live Logs</span>
-          <div class="title-bar-stripes"></div>
-        </div>
-        <div class="window-content">
-          <div class="section-header">
-            <label class="checkbox-row">
-              <input type="checkbox" id="auto-scroll" checked>
-              Auto-scroll
-            </label>
-            <button id="clear-logs" class="btn">Clear</button>
-          </div>
-          <div id="logs" class="log-area"></div>
-        </div>
-      </div>
+        <hr class="divider">
 
-      <!-- Artifacts Window -->
-      <div class="window">
-        <div class="title-bar">
-          <div class="close-box"></div>
-          <div class="title-bar-stripes"></div>
-          <span class="window-title">Artifacts</span>
-          <div class="title-bar-stripes"></div>
-        </div>
-        <div class="window-content">
-          <label class="checkbox-row">
-            <input type="checkbox" id="show-advanced">
-            Show artifacts
-          </label>
-          <div id="artifacts" style="display:none;margin-top:8px;"></div>
-        </div>
-      </div>
-
-      <!-- Sessions Window -->
-      <div class="window">
-        <div class="title-bar">
-          <div class="close-box"></div>
-          <div class="title-bar-stripes"></div>
-          <span class="window-title">Sessions</span>
-          <div class="title-bar-stripes"></div>
-        </div>
-        <div class="window-content">
-          <div id="sessions" class="list-box">
-            <div class="list-item" style="color:#888;">No sessions yet.</div>
-          </div>
+        <div class="button-row">
+          <button id="stop" class="btn">Stop</button>
+          <button id="start" class="btn btn-default">Start</button>
         </div>
       </div>
     </div>
 
-    <script>
-      const logsEl = document.getElementById("logs");
-      const statusEl = document.getElementById("status");
-      const statusLed = document.getElementById("status-led");
-      const threadEl = document.getElementById("thread");
-      const artifactsEl = document.getElementById("artifacts");
-      const sessionsEl = document.getElementById("sessions");
+    <!-- Logs Window -->
+    <div class="window">
+      <div class="title-bar">
+        <div class="close-box"></div>
+        <div class="title-bar-stripes"></div>
+        <span class="window-title">Live Logs</span>
+        <div class="title-bar-stripes"></div>
+      </div>
+      <div class="window-content">
+        <div class="section-header">
+          <label class="checkbox-row">
+            <input type="checkbox" id="auto-scroll" checked>
+            Auto-scroll
+          </label>
+          <button id="clear-logs" class="btn">Clear</button>
+        </div>
+        <div id="logs" class="log-area"></div>
+      </div>
+    </div>
 
-      const goalEl = document.getElementById("goal");
-      const maxEl = document.getElementById("max");
-      const workdirEl = document.getElementById("workdir");
-      const openProjectBtn = document.getElementById("open-project");
-      const newProjectBtn = document.getElementById("new-project");
-      const startBtn = document.getElementById("start");
-      const stopBtn = document.getElementById("stop");
-      const autoScrollEl = document.getElementById("auto-scroll");
-      const clearLogsBtn = document.getElementById("clear-logs");
-      const showAdvEl = document.getElementById("show-advanced");
+    <!-- Artifacts Window -->
+    <div class="window">
+      <div class="title-bar">
+        <div class="close-box"></div>
+        <div class="title-bar-stripes"></div>
+        <span class="window-title">Artifacts</span>
+        <div class="title-bar-stripes"></div>
+      </div>
+      <div class="window-content">
+        <label class="checkbox-row">
+          <input type="checkbox" id="show-advanced">
+          Show artifacts
+        </label>
+        <div id="artifacts" style="display:none;margin-top:8px;"></div>
+      </div>
+    </div>
 
-      let es;
-      let running = false;
+    <!-- Sessions Window -->
+    <div class="window">
+      <div class="title-bar">
+        <div class="close-box"></div>
+        <div class="title-bar-stripes"></div>
+        <span class="window-title">Sessions</span>
+        <div class="title-bar-stripes"></div>
+      </div>
+      <div class="window-content">
+        <div id="sessions" class="list-box">
+          <div class="list-item" style="color:#888;">No sessions yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      function appendLog(line) {
-        logsEl.textContent += line + "\n";
-        if (autoScrollEl.checked) logsEl.scrollTop = logsEl.scrollHeight;
+  <script>
+    const logsEl = document.getElementById("logs");
+    const statusEl = document.getElementById("status");
+    const statusLed = document.getElementById("status-led");
+    const threadEl = document.getElementById("thread");
+    const artifactsEl = document.getElementById("artifacts");
+    const sessionsEl = document.getElementById("sessions");
+    const milhouseEl = document.getElementById("milhouse-running");
+
+    const goalEl = document.getElementById("goal");
+    const maxEl = document.getElementById("max");
+    const workdirEl = document.getElementById("workdir");
+    const openProjectBtn = document.getElementById("open-project");
+    const newProjectBtn = document.getElementById("new-project");
+    const startBtn = document.getElementById("start");
+    const stopBtn = document.getElementById("stop");
+    const autoScrollEl = document.getElementById("auto-scroll");
+    const clearLogsBtn = document.getElementById("clear-logs");
+    const showAdvEl = document.getElementById("show-advanced");
+
+    let es;
+    let running = false;
+
+    function appendLog(line) {
+      logsEl.textContent += line + "\n";
+      if (autoScrollEl.checked) logsEl.scrollTop = logsEl.scrollHeight;
+    }
+
+    function setStatus(text, state = "idle") {
+      statusEl.textContent = text;
+      statusLed.className = "status-led " + state;
+    }
+
+    function setThread(text) {
+      threadEl.textContent = text ? "Thread: " + text : "";
+    }
+
+    function setRunning(value) {
+      running = Boolean(value);
+      updateControls();
+      if (running) {
+        milhouseEl.classList.add("visible");
+      } else {
+        milhouseEl.classList.remove("visible");
       }
+    }
 
-      function setStatus(text, state = "idle") {
-        statusEl.textContent = text;
-        statusLed.className = "status-led " + state;
-      }
+    function updateControls() {
+      const hasGoal = goalEl.value.trim().length > 0;
+      startBtn.disabled = running || !hasGoal;
+      stopBtn.disabled = !running;
+    }
 
-      function setThread(text) {
-        threadEl.textContent = text ? "Thread: " + text : "";
-      }
+    async function fetchStatus() {
+      const res = await fetch("/api/status");
+      const data = await res.json();
+      setStatus(data.running ? "Running" : "Idle", data.running ? "running" : "idle");
+      setThread(data.session?.threadId || data.artifacts?.threadId || "");
+      renderArtifacts(data.artifacts || {});
+      setRunning(data.running);
+    }
 
-      function setRunning(value) {
-        running = Boolean(value);
-        updateControls();
-      }
-
-      function updateControls() {
-        const hasGoal = goalEl.value.trim().length > 0;
-        startBtn.disabled = running || !hasGoal;
-        stopBtn.disabled = !running;
-      }
-
-      async function fetchStatus() {
-        const res = await fetch("/api/status");
-        const data = await res.json();
-        setStatus(data.running ? "Running" : "Idle", data.running ? "running" : "idle");
-        setThread(data.session?.threadId || data.artifacts?.threadId || "");
-        renderArtifacts(data.artifacts || {});
-        setRunning(data.running);
-      }
-
-      async function fetchSessions() {
-        const res = await fetch("/api/sessions");
-        const data = await res.json();
-        const list = (data.sessions || [])
-          .slice()
-          .reverse()
-          .map(
-            (s) =>
-              `<div class="list-item">
+    async function fetchSessions() {
+      const res = await fetch("/api/sessions");
+      const data = await res.json();
+      const list = (data.sessions || [])
+        .slice()
+        .reverse()
+        .map(
+          (s) =>
+            `<div class="list-item">
                 <strong>${escapeHtml(s.goal || "No goal")}</strong>
                 <div class="meta">${s.status} • ${formatDateTime(s.startedAt)}</div>
               </div>`,
-          )
-          .join("");
-        sessionsEl.innerHTML = list || '<div class="list-item" style="color:#888;">No sessions yet.</div>';
+        )
+        .join("");
+      sessionsEl.innerHTML = list || '<div class="list-item" style="color:#888;">No sessions yet.</div>';
+    }
+
+    function renderArtifacts(a) {
+      if (!showAdvEl.checked) {
+        artifactsEl.style.display = "none";
+        return;
       }
+      artifactsEl.style.display = "block";
+      const parts = [];
+      if (a.threadId)
+        parts.push(`<div><strong>Thread:</strong> ${escapeHtml(a.threadId)}</div>`);
 
-      function renderArtifacts(a) {
-        if (!showAdvEl.checked) {
-          artifactsEl.style.display = "none";
-          return;
-        }
-        artifactsEl.style.display = "block";
-        const parts = [];
-        if (a.threadId)
-          parts.push(`<div><strong>Thread:</strong> ${escapeHtml(a.threadId)}</div>`);
+      const artifactDefs = [
+        { key: "planLog", title: "Plan log" },
+        { key: "buildLog", title: "Build log" },
+        { key: "planFile", title: "IMPLEMENTATION_PLAN.md" },
+      ];
 
-        const artifactDefs = [
-          { key: "planLog", title: "Plan log" },
-          { key: "buildLog", title: "Build log" },
-          { key: "planFile", title: "IMPLEMENTATION_PLAN.md" },
-        ];
-
-        artifactDefs.forEach(({ key, title }) => {
-          const content = a[key];
-          if (!content) return;
-          parts.push(
-            `<div style="margin-top:8px;">
+      artifactDefs.forEach(({ key, title }) => {
+        const content = a[key];
+        if (!content) return;
+        parts.push(
+          `<div style="margin-top:8px;">
               <strong>${title}:</strong>
               <div class="log-area" style="height:100px;margin-top:4px;">${escapeHtml(content)}</div>
             </div>`,
-          );
-        });
-
-        artifactsEl.innerHTML = parts.join("") || "<em>No artifacts yet.</em>";
-      }
-
-      function escapeHtml(str) {
-        return str
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
-      }
-
-      function formatDateTime(value) {
-        if (!value) return "";
-        const d = new Date(value);
-        if (Number.isNaN(d.getTime())) return "";
-        return d.toLocaleString();
-      }
-
-      function startStream() {
-        if (es) es.close();
-        es = new EventSource("/api/events");
-        es.onmessage = (ev) => {
-          appendLog(ev.data);
-          const threadMatch = ev.data.match(/thread:\s*([0-9a-zA-Z-]+)/);
-          if (threadMatch) setThread(threadMatch[1]);
-          const loopMatch = ev.data.match(/LOOP\s+(\d+)/i);
-          if (loopMatch) setStatus("Running (loop " + loopMatch[1] + ")", "running");
-          if (/\[exit\]/i.test(ev.data)) setRunning(false);
-        };
-      }
-
-      startBtn.onclick = async () => {
-        logsEl.textContent = "";
-        const trimmedGoal = goalEl.value.trim();
-        if (!trimmedGoal) {
-          appendLog("Error: goal is required");
-          setStatus("Error", "error");
-          return;
-        }
-        const body = {
-          goal: trimmedGoal,
-          maxIterations: Number(maxEl.value) || 0,
-          workdir: workdirEl.value.trim() || undefined,
-        };
-        setRunning(true);
-        const res = await fetch("/api/start", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        if (!res.ok) {
-          const err = await res.json();
-          appendLog("Error: " + (err.error || res.statusText));
-          setRunning(false);
-          setStatus("Error", "error");
-          return;
-        }
-        setStatus("Running", "running");
-        fetchStatus();
-        fetchSessions();
-      };
-
-      stopBtn.onclick = async () => {
-        await fetch("/api/stop", { method: "POST" });
-        setStatus("Stopping", "idle");
-        setRunning(false);
-      };
-
-      clearLogsBtn.onclick = () => {
-        logsEl.textContent = "";
-      };
-
-      goalEl.addEventListener("input", updateControls);
-
-      openProjectBtn.onclick = () => {
-        fetch("/api/browse", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: "{}"
-        })
-          .then((r) => r.text().then((t) => ({ ok: r.ok, text: t })))
-          .then(({ ok, text }) => {
-            try {
-              const data = JSON.parse(text);
-              if (data.path) workdirEl.value = data.path;
-              else if (data.error) appendLog("Browse error: " + data.error);
-            } catch {
-              if (!ok) appendLog("Browse error: " + text.slice(0, 200));
-            }
-          })
-          .catch((e) => appendLog("Browse error: " + e.message));
-      };
-
-      newProjectBtn.onclick = () => {
-        fetch("/api/browse", { method: "POST", headers: { "Content-Type": "application/json" } })
-          .then((r) => r.text().then((t) => ({ ok: r.ok, text: t })))
-          .then(({ ok, text }) => {
-            let base = "";
-            try {
-              const data = JSON.parse(text);
-              if (!data.path && data.error) {
-                appendLog("Browse error: " + data.error);
-                return;
-              }
-              base = data.path || "";
-            } catch {
-              if (!ok) {
-                appendLog("Browse error: " + text.slice(0, 200));
-                return;
-              }
-            }
-            const name = prompt("Enter new project folder name", "millhouse-project");
-            if (name) {
-              const sep = base.endsWith("\\") || base.endsWith("/") ? "" : pathSeparator(base);
-              workdirEl.value = base + sep + name;
-            }
-          })
-          .catch((e) => appendLog("Browse error: " + e.message));
-      };
-
-      function pathSeparator(p) {
-        return p.includes("\\") ? "\\" : "/";
-      }
-
-      showAdvEl.addEventListener("change", () => {
-        fetchStatus();
+        );
       });
 
-      updateControls();
-      startStream();
+      artifactsEl.innerHTML = parts.join("") || "<em>No artifacts yet.</em>";
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return "";
+      return d.toLocaleString();
+    }
+
+    function startStream() {
+      if (es) es.close();
+      es = new EventSource("/api/events");
+      es.onmessage = (ev) => {
+        appendLog(ev.data);
+        const threadMatch = ev.data.match(/thread:\s*([0-9a-zA-Z-]+)/);
+        if (threadMatch) setThread(threadMatch[1]);
+        const loopMatch = ev.data.match(/LOOP\s+(\d+)/i);
+        if (loopMatch) setStatus("Running (loop " + loopMatch[1] + ")", "running");
+        if (/\[exit\]/i.test(ev.data)) setRunning(false);
+      };
+    }
+
+    startBtn.onclick = async () => {
+      logsEl.textContent = "";
+      const trimmedGoal = goalEl.value.trim();
+      if (!trimmedGoal) {
+        appendLog("Error: goal is required");
+        setStatus("Error", "error");
+        return;
+      }
+      const body = {
+        goal: trimmedGoal,
+        maxIterations: Number(maxEl.value) || 0,
+        workdir: workdirEl.value.trim() || undefined,
+      };
+      setRunning(true);
+      const res = await fetch("/api/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        appendLog("Error: " + (err.error || res.statusText));
+        setRunning(false);
+        setStatus("Error", "error");
+        return;
+      }
+      setStatus("Running", "running");
       fetchStatus();
       fetchSessions();
-      setInterval(() => {
-        fetchStatus();
-        fetchSessions();
-      }, 5000);
-    </script>
-  </body>
+    };
+
+    stopBtn.onclick = async () => {
+      await fetch("/api/stop", { method: "POST" });
+      setStatus("Stopping", "idle");
+      setRunning(false);
+    };
+
+    clearLogsBtn.onclick = () => {
+      logsEl.textContent = "";
+    };
+
+    goalEl.addEventListener("input", updateControls);
+
+    openProjectBtn.onclick = () => {
+      fetch("/api/browse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}"
+      })
+        .then((r) => r.text().then((t) => ({ ok: r.ok, text: t })))
+        .then(({ ok, text }) => {
+          try {
+            const data = JSON.parse(text);
+            if (data.path) workdirEl.value = data.path;
+            else if (data.error) appendLog("Browse error: " + data.error);
+          } catch {
+            if (!ok) appendLog("Browse error: " + text.slice(0, 200));
+          }
+        })
+        .catch((e) => appendLog("Browse error: " + e.message));
+    };
+
+    newProjectBtn.onclick = () => {
+      fetch("/api/browse", { method: "POST", headers: { "Content-Type": "application/json" } })
+        .then((r) => r.text().then((t) => ({ ok: r.ok, text: t })))
+        .then(({ ok, text }) => {
+          let base = "";
+          try {
+            const data = JSON.parse(text);
+            if (!data.path && data.error) {
+              appendLog("Browse error: " + data.error);
+              return;
+            }
+            base = data.path || "";
+          } catch {
+            if (!ok) {
+              appendLog("Browse error: " + text.slice(0, 200));
+              return;
+            }
+          }
+          const name = prompt("Enter new project folder name", "milhouse-project");
+          if (name) {
+            const sep = base.endsWith("\\") || base.endsWith("/") ? "" : pathSeparator(base);
+            workdirEl.value = base + sep + name;
+          }
+        })
+        .catch((e) => appendLog("Browse error: " + e.message));
+    };
+
+    function pathSeparator(p) {
+      return p.includes("\\") ? "\\" : "/";
+    }
+
+    showAdvEl.addEventListener("change", () => {
+      fetchStatus();
+    });
+
+    updateControls();
+    startStream();
+    fetchStatus();
+    fetchSessions();
+    setInterval(() => {
+      fetchStatus();
+      fetchSessions();
+    }, 5000);
+  </script>
+</body>
+
 </html>
