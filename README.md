@@ -2,6 +2,9 @@
 
 ![Milhouse](milhouse.png)
 
+Support the $milhouse Token on Solana:
+5JcCJT1C8449okbHUvc2owukMy2UAERdJWzdgr9rBAGS
+
 [milhouse on npm](https://www.npmjs.com/package/milhouse)
 
 Milhouse Van Houten is a chad pair programmer that provides a lightweight web UI for running Codex threads, starting with a quick planning phase and iterating through builds until the job is done. Inspired by a Ralph Wiggum-style autonomous loop, Milhouse focuses on simplicity, approachability, and making experimentation fun and easy to modify.
@@ -15,6 +18,8 @@ This repository contains the **bare-bones** version of Milhouse. It represents t
 * Live logs via Server-Sent Events (SSE)
 * Session history with status tracking
 * Cross-platform folder picker (Windows, macOS, Linux)
+
+![Milhouse](milhouse.png)
 
 ## Prerequisites
 
