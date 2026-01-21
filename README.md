@@ -2,7 +2,8 @@
 
 ![Milhouse](milhouse.png)
 
-Support the $milhouse Token on Solana:
+* Support the $milhouse Token on Solana:
+
 5JcCJT1C8449okbHUvc2owukMy2UAERdJWzdgr9rBAGS
 
 [milhouse on npm](https://www.npmjs.com/package/milhouse)
