@@ -20,7 +20,7 @@ This repository contains the **bare-bones** version of Milhouse. It represents t
 * Session history with status tracking
 * Cross-platform folder picker (Windows, macOS, Linux)
 
-![Milhouse](milhouse.png)
+![Milhouse-web-ui](milhouse-screenshot.png)
 
 ## Prerequisites
 
